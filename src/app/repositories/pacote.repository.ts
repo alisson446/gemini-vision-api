@@ -1,268 +1,212 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
 import { IPacote, IPacoteDTO, IPacoteResponse } from "../interfaces/Pacote"
-import { IIndex } from "../interfaces/Helper"
 import crypto from 'crypto'
 
 class PacoteRepository implements IPacote {
 
   private prisma = prismaManager.getPrisma()
 
-  index = async ({ orderBy, order, skip, take, filter }: IIndex): Promise<{ count: number, rows: IPacoteResponse[] }> => {
+  // create = async ({
+  //   nome,
+  //   descricao,
+  //   origem,
+  //   tipoTransporte,
+  //   urlImagem,
+  //   urlImgEsgotado,
+  //   categoria,
+  //   usuarioCadastro,
+  //   opcionais }: IPacoteDTO): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
-    const where = {
-      ativo: true
-    }
+  //   try {
 
-    Object.entries(filter as { [key: string]: string }).map(([key, value]) => {
+  //     const id = crypto.randomUUID()
 
-      switch (key) {
-        case 'nome':
-          Object.assign(where, {
-            OR: [
-              {
-                nome: {
-                  contains: value,
-                  mode: "insensitive"
-                }
-              },
-            ]
-          })
-          break;
+  //     const opcional = {}
 
-        case 'valor':
-          Object.assign(where, {
-            OR: [
-              {
-                valor: {
-                  equals: parseFloat(value),
-                }
-              }
-            ]
-          })
-          break;
-      }
-    })
+  //     if (opcionais) {
+  //       Object.assign(opcional,
+  //         {
+  //           Produto: {
+  //             connect: opcionais.map((opt) => { return { id: opt } })
+  //           }
+  //         }
+  //       )
+  //     }
 
-    const [count, rows] = await this.prisma.$transaction([
-      this.prisma.pacotes.count({ where }),
-      this.prisma.pacotes.findMany({
-        skip,
-        take,
-        orderBy: {
-          [orderBy as string]: order
-        },
-        where,
-        include: {
-          Excursao: true,
-          Produto: true
-        }
-      })
-    ])
+  //     const pacote = await this.prisma.pacotes.create({
+  //       data: {
+  //         id,
+  //         nome,
+  //         descricao,
+  //         urlImagem,
+  //         urlImgEsgotado,
+  //         origem,
+  //         tipoTransporte,
+  //         categoria,
+  //         usuarioCadastro,
+  //         ...opcional
+  //       }
+  //     })
 
-    return { count, rows }
-  }
+  //     return { 'pacote': pacote, 'success': true }
 
-  create = async ({
-    nome,
-    descricao,
-    origem,
-    tipoTransporte,
-    urlImagem,
-    urlImgEsgotado,
-    categoria,
-    usuarioCadastro,
-    opcionais }: IPacoteDTO): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
+  //   } catch (error) {
+  //     throw new Warning('Não foi possivel inserir o pacote', 400)
+  //   }
+  // }
 
-    try {
+  // find = async (id: string): Promise<IPacoteResponse> => {
 
-      const id = crypto.randomUUID()
+  //   const pacote = await this.prisma.pacotes.findFirst({
+  //     where: {
+  //       id
+  //     },
+  //     include: {
+  //       Produto: true
+  //     }
+  //   })
 
-      const opcional = {}
+  //   if (!pacote) {
+  //     throw new Warning("Pacote não encontrado", 400)
+  //   }
 
-      if (opcionais) {
-        Object.assign(opcional,
-          {
-            Produto: {
-              connect: opcionais.map((opt) => { return { id: opt } })
-            }
-          }
-        )
-      }
+  //   return pacote
+  // }
 
-      const pacote = await this.prisma.pacotes.create({
-        data: {
-          id,
-          nome,
-          descricao,
-          urlImagem,
-          urlImgEsgotado,
-          origem,
-          tipoTransporte,
-          categoria,
-          usuarioCadastro,
-          ...opcional
-        }
-      })
+  // findAll = async (): Promise<IPacoteResponse[]> => {
 
-      return { 'pacote': pacote, 'success': true }
+  //   const pacotes = await this.prisma.pacotes.findMany({
+  //     include: {
+  //       Produto: true
+  //     }
+  //   })
 
-    } catch (error) {
-      throw new Warning('Não foi possivel inserir o pacote', 400)
-    }
-  }
+  //   if (!pacotes) {
+  //     throw new Warning("Sem pacotes encontrados na base", 400)
+  //   }
 
-  find = async (id: string): Promise<IPacoteResponse> => {
+  //   return pacotes
+  // }
 
-    const pacote = await this.prisma.pacotes.findFirst({
-      where: {
-        id
-      },
-      include: {
-        Produto: true
-      }
-    })
+  // update = async ({
+  //   nome,
+  //   descricao,
+  //   ativo,
+  //   urlImagem,
+  //   urlImgEsgotado,
+  //   idWP,
+  //   categoria,
+  //   origem,
+  //   tipoTransporte,
+  //   usuarioCadastro,
+  //   opcionais }: IPacoteDTO, id: string): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
 
-    if (!pacote) {
-      throw new Warning("Pacote não encontrado", 400)
-    }
+  //   try {
 
-    return pacote
-  }
+  //     const opcional = {}
 
-  findAll = async (): Promise<IPacoteResponse[]> => {
+  //     await this.prisma.pacotes.update({
+  //       where: {
+  //         id
+  //       },
+  //       data: {
+  //         Produto: {
+  //           set: []
+  //         }
+  //       }
+  //     })
 
-    const pacotes = await this.prisma.pacotes.findMany({
-      include: {
-        Produto: true
-      }
-    })
+  //     if (opcionais) {
+  //       Object.assign(opcional,
+  //         {
+  //           Produto: {
+  //             connect: opcionais.map((opt) => { return { id: opt } })
+  //           }
+  //         }
+  //       )
+  //     }
 
-    if (!pacotes) {
-      throw new Warning("Sem pacotes encontrados na base", 400)
-    }
+  //     const pacote = await this.prisma.pacotes.update({
+  //       data: {
+  //         nome,
+  //         descricao,
+  //         ativo,
+  //         urlImagem,
+  //         urlImgEsgotado,
+  //         idWP,
+  //         categoria,
+  //         origem,
+  //         tipoTransporte,
+  //         usuarioCadastro,
+  //         ...opcional
+  //       },
+  //       where: {
+  //         id
+  //       }
+  //     })
 
-    return pacotes
-  }
+  //     return { 'pacote': pacote, 'success': true }
 
-  update = async ({
-    nome,
-    descricao,
-    ativo,
-    urlImagem,
-    urlImgEsgotado,
-    idWP,
-    categoria,
-    origem,
-    tipoTransporte,
-    usuarioCadastro,
-    opcionais }: IPacoteDTO, id: string): Promise<{ 'pacote': IPacoteResponse, 'success': boolean }> => {
+  //   } catch (error) {
+  //     throw new Warning('Erro ao atualizar pacote', 400)
+  //   }
+  // }
 
-    try {
+  // delete = async (id: string): Promise<IPacoteResponse> => {
 
-      const opcional = {}
+  //   try {
 
-      await this.prisma.pacotes.update({
-        where: {
-          id
-        },
-        data: {
-          Produto: {
-            set: []
-          }
-        }
-      })
+  //     const pacote = await this.prisma.pacotes.update({
+  //       data: {
+  //         ativo: false
+  //       },
+  //       where: {
+  //         id
+  //       }
+  //     })
 
-      if (opcionais) {
-        Object.assign(opcional,
-          {
-            Produto: {
-              connect: opcionais.map((opt) => { return { id: opt } })
-            }
-          }
-        )
-      }
+  //     return pacote
+  //   } catch (error) {
+  //     throw new Warning('Ocorreu um erro ao excluir pacote', 400)
+  //   }
+  // }
 
-      const pacote = await this.prisma.pacotes.update({
-        data: {
-          nome,
-          descricao,
-          ativo,
-          urlImagem,
-          urlImgEsgotado,
-          idWP,
-          categoria,
-          origem,
-          tipoTransporte,
-          usuarioCadastro,
-          ...opcional
-        },
-        where: {
-          id
-        }
-      })
+  // setIdWP = async (id: string, idWP: number): Promise<string[]> => {
 
-      return { 'pacote': pacote, 'success': true }
+  //   try {
 
-    } catch (error) {
-      throw new Warning('Erro ao atualizar pacote', 400)
-    }
-  }
+  //     const pacote = await this.prisma.pacotes.update({
+  //       data: {
+  //         idWP: idWP
+  //       },
+  //       where: {
+  //         id
+  //       }
+  //     })
 
-  delete = async (id: string): Promise<IPacoteResponse> => {
+  //     return ['Pacote atualizado com sucesso']
+  //   } catch (error) {
+  //     throw new Warning('Ocorreu um erro ao atualizar pacote', 400)
+  //   }
+  // }
 
-    try {
+  // getAllByIds = async (ids: Array<number>): Promise<IPacoteResponse[]> => {
 
-      const pacote = await this.prisma.pacotes.update({
-        data: {
-          ativo: false
-        },
-        where: {
-          id
-        }
-      })
+  //   const pacotes = await this.prisma.pacotes.findMany({
+  //     where: {
+  //       idWP: {
+  //         in: ids
+  //       }
+  //     }
+  //   })
 
-      return pacote
-    } catch (error) {
-      throw new Warning('Ocorreu um erro ao excluir pacote', 400)
-    }
-  }
+  //   if (!pacotes) {
+  //     throw new Warning("Nenhum Pacote Encontrado", 400)
+  //   }
 
-  setIdWP = async (id: string, idWP: number): Promise<string[]> => {
-
-    try {
-
-      const pacote = await this.prisma.pacotes.update({
-        data: {
-          idWP: idWP
-        },
-        where: {
-          id
-        }
-      })
-
-      return ['Pacote atualizado com sucesso']
-    } catch (error) {
-      throw new Warning('Ocorreu um erro ao atualizar pacote', 400)
-    }
-  }
-
-  getAllByIds = async (ids: Array<number>): Promise<IPacoteResponse[]> => {
-
-    const pacotes = await this.prisma.pacotes.findMany({
-      where: {
-        idWP: {
-          in: ids
-        }
-      }
-    })
-
-    if (!pacotes) {
-      throw new Warning("Nenhum Pacote Encontrado", 400)
-    }
-
-    return pacotes
-  }
+  //   return pacotes
+  // }
 
 }
 

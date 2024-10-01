@@ -6,6 +6,7 @@ import "./shared/container"
 import { warning } from "./app/middlewares/error.middleware"
 import cors from 'cors'
 import { router } from './app/routes'
+import { logger } from './shared/utils/logger'
 
 const app = express()
 const PORT = process.env.PORT
@@ -22,5 +23,5 @@ app.use(router)
 app.use(warning)
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na url: http://localhost:${PORT}`)
+  logger.info(`Servidor rodando na url: http://localhost:${PORT}`)
 })
