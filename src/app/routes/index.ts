@@ -3,6 +3,6 @@ import { measure } from "../routes/measure.routes"
 
 const router = Router()
 
-router.use('/upload', measure)
+router.use('/', measure)
 
 export { router }

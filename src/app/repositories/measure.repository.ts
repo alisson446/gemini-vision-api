@@ -1,6 +1,6 @@
 import prismaManager from "../database/database"
 import { Warning } from "../errors"
-import { IMeasure, IMeasureDTO, IMeasureFindTypeAndDate, IMeasureResponse } from "../interfaces/Measure"
+import { IMeasure, IMeasureConfirm, IMeasureDTO, IMeasureFindTypeAndDate, IMeasureResponse } from "../interfaces/Measure"
 
 class MeasureRepository implements IMeasure {
 
@@ -31,6 +31,14 @@ class MeasureRepository implements IMeasure {
     }
   }
 
+  findById (id: string): Promise<IMeasureResponse | null> {
+    return this.prisma.measure.findUnique({
+      where: {
+        id
+      }
+    })
+  }
+
   findByTypeAndDate = async ({
     type,
     measureDateTime
@@ -47,6 +55,28 @@ class MeasureRepository implements IMeasure {
 
     } catch (error) {
       throw new Warning('Não foi possivel encontrar a medição', 400)
+    }
+  }
+
+  confirm = async ({
+    id,
+    value
+  }: IMeasureConfirm): Promise<IMeasureResponse> => {
+
+    try {
+
+      return await this.prisma.measure.update({
+        where: {
+          id
+        },
+        data: {
+          value,
+          confirmed: true
+        }
+      })
+
+    } catch (error) {
+      throw new Warning('Não foi possivel confirmar a medição', 400)
     }
   }
 

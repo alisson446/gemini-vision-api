@@ -5,10 +5,10 @@ const fileManager = new GoogleAIFileManager(process.env.GEMINI_API_KEY as string
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string)
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" })
 
-export async function uploadImage (name: string, filePath: string, mimeType: string): Promise<UploadFileResponse> {
+export async function uploadImage (displayName: string, filePath: string, mimeType: string): Promise<UploadFileResponse> {
   const uploadResponse = await fileManager.uploadFile(filePath, {
     mimeType,
-    displayName: name
+    displayName
   })
 
   return uploadResponse

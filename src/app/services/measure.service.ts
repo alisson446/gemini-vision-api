@@ -4,7 +4,7 @@ import { MeasureRepository } from "../repositories/measure.repository"
 import { extractMimeType } from "../../shared/utils/image"
 import { analyzeImage, getImageData, uploadImage } from "../api/gemini-vision"
 import { getExtensionFromBase64, removeTempFile, saveBase64AsTempFile } from "../../shared/utils/files"
-import { IMeasureUploadBody } from "../interfaces/Measure"
+import { IMeasureConfirmValidator, IMeasureUploadValidator } from "../interfaces/Measure"
 import { validate } from "class-validator"
 
 @injectable()
@@ -20,20 +20,20 @@ export class MeasureService {
     customer_code,
     measure_datetime,
     measure_type
-  }: IMeasureUploadBody): Promise<{
+  }: IMeasureUploadValidator): Promise<{
     image_url: string
     measure_value: string
     measure_uuid: string
   }> => {
 
-    const companyAssociatedPartnershipValidator = new IMeasureUploadBody({
+    const measureValidator = new IMeasureUploadValidator({
       image,
       customer_code,
       measure_datetime,
       measure_type
     })
 
-    const errors = await validate(companyAssociatedPartnershipValidator)
+    const errors = await validate(measureValidator)
 
     if (errors.length > 0) {
       throw new Warning({
@@ -71,7 +71,7 @@ export class MeasureService {
       const analyzedImage = await analyzeImage(uploadResponse.file.uri, uploadResponse.file.mimeType)
 
       const measure = await this.measureRepository.create({
-        value: parseFloat(analyzedImage),
+        value: parseInt(analyzedImage),
         customerCode: customer_code,
         measureDateTime: measure_datetime,
         type: measure_type,
@@ -90,4 +90,52 @@ export class MeasureService {
       await removeTempFile(filePath)
     }
   }
+
+  confirm = async ({
+    measure_uuid,
+    confirmed_value
+  }: IMeasureConfirmValidator): Promise<{
+    success: boolean
+  }> => {
+
+    const measureValidator = new IMeasureConfirmValidator({
+      measure_uuid,
+      confirmed_value
+    })
+
+    const errors = await validate(measureValidator)
+
+    if (errors.length > 0) {
+      throw new Warning({
+        error_code: "INVALID_DATA",
+        error_description: errors
+      }, 400)
+    }
+
+    const measure = await this.measureRepository.findById(measure_uuid)
+
+    if (!measure) {
+      throw new Warning({
+        error_code: "MEASURE_NOT_FOUND",
+        error_description: "Leitura não encontrada"
+      }, 404)
+    }
+
+    if (measure.confirmed) {
+      throw new Warning({
+        error_code: "CONFIRMATION_DUPLICATE",
+        error_description: "Leitura do mês já realizada"
+      }, 409)
+    }
+
+    await this.measureRepository.confirm({
+      id: measure_uuid,
+      value: parseInt(confirmed_value)
+    })
+
+    return {
+      success: true
+    }
+  }
+
 }

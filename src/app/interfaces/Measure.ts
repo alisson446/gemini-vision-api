@@ -1,11 +1,13 @@
 import { MeasureType } from "@prisma/client"
-import { IsEnum, IsNotEmpty, IsString, Validate } from "class-validator"
+import { IsEnum, IsNotEmpty, IsNumber, IsString, Validate } from "class-validator"
 import { fieldInvalid, fieldRequired } from "../../shared/utils/messages"
 import { DateValidatorConstraint, ImageValidatorConstraint } from "../../shared/utils/customClassValidator"
 
 export interface IMeasure {
   create (data: IMeasureDTO): Promise<IMeasureResponse>
+  findById (id: string): Promise<IMeasureResponse | null>
   findByTypeAndDate (data: IMeasureFindTypeAndDate): Promise<IMeasureResponse | null>
+  confirm (data: IMeasureConfirm): Promise<IMeasureResponse>
 }
 
 export interface IMeasureDTO {
@@ -28,7 +30,12 @@ export interface IMeasureFindTypeAndDate {
   measureDateTime: Date
 }
 
-export class IMeasureUploadBody {
+export interface IMeasureConfirm {
+  id: string
+  value: number
+}
+
+export class IMeasureUploadValidator {
 
   @IsNotEmpty({ message: fieldRequired("image") })
   @IsString({ message: fieldInvalid("image") })
@@ -47,7 +54,22 @@ export class IMeasureUploadBody {
   @IsEnum(MeasureType, { message: fieldInvalid("measure_type") })
   measure_type!: MeasureType
 
-  constructor (data: IMeasureUploadBody) {
+  constructor (data: IMeasureUploadValidator) {
+    Object.assign(this, data)
+  }
+}
+
+export class IMeasureConfirmValidator {
+
+  @IsNotEmpty({ message: fieldRequired("measure_uuid") })
+  @IsString({ message: fieldInvalid("measure_uuid") })
+  measure_uuid!: string
+
+  @IsNotEmpty({ message: fieldRequired("confirmed_value") })
+  @IsNumber({}, { message: fieldInvalid("confirmed_value") })
+  confirmed_value!: string
+
+  constructor (data: IMeasureConfirmValidator) {
     Object.assign(this, data)
   }
 }

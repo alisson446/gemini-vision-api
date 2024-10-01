@@ -3,6 +3,7 @@ import { measureController } from "../controllers"
 
 const measure = Router()
 
-measure.post("/", measureController.upload)
+measure.post("/upload", measureController.upload)
+measure.patch("/confirm", measureController.confirm)
 
 export { measure }

@@ -15,6 +15,13 @@ class MeasureController {
 
     response.status(200).send(res)
   }
+
+  confirm = async (request: Request, response: Response): Promise<void> => {
+
+    const res = await this.measureService.confirm(request.body)
+
+    response.status(200).send(res)
+  }
 }
 
 export { MeasureController }
