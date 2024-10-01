@@ -57,8 +57,8 @@ export class MeasureService {
     const mimeType = extractMimeType(image) as string
     const base64 = image.split("base64,").pop() as string
 
-    const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join("")
     const extension = getExtensionFromBase64(image)
+    const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join("")
     const fileName = `${randomName}.${extension}`
 
     const filePath = await saveBase64AsTempFile(base64, fileName)

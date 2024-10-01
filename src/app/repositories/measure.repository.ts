@@ -20,7 +20,7 @@ class MeasureRepository implements IMeasure {
         data: {
           value,
           customerCode,
-          measureDateTime,
+          measureDateTime: new Date(measureDateTime),
           type,
           imageUrl
         }
@@ -45,11 +45,21 @@ class MeasureRepository implements IMeasure {
   }: IMeasureFindTypeAndDate): Promise<IMeasureResponse | null> => {
 
     try {
+      const date = new Date(measureDateTime)
+
+      const year = date.getFullYear()
+      const month = date.getMonth() + 1
+
+      const startDate = new Date(year, month - 1, 1)
+      const endDate = new Date(year, month, 1)
 
       return await this.prisma.measure.findFirst({
         where: {
           type,
-          measureDateTime
+          measureDateTime: {
+            gte: startDate,
+            lt: endDate
+          }
         }
       })
 
