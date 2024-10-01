@@ -5,6 +5,7 @@ import { DateValidatorConstraint, ImageValidatorConstraint } from "../../shared/
 
 export interface IMeasure {
   create (data: IMeasureDTO): Promise<IMeasureResponse>
+  findByTypeAndDate (data: IMeasureFindTypeAndDate): Promise<IMeasureResponse | null>
 }
 
 export interface IMeasureDTO {
@@ -20,6 +21,11 @@ export interface IMeasureResponse extends IMeasureDTO {
   id: string
   createdAt: Date
   updatedAt: Date
+}
+
+export interface IMeasureFindTypeAndDate {
+  type: MeasureType
+  measureDateTime: Date
 }
 
 export class IMeasureUploadBody {

@@ -38,17 +38,23 @@ export class Warning {
 
     const isIWarningMessage = message && typeof message === 'object' && 'error_description' in message
 
-    if (isIWarningMessage && Array.isArray(message.error_description) && message.error_description[0] instanceof ValidationError) {
-      const errors: string[] = message.error_description.map(value => {
+    if (isIWarningMessage) {
 
-        const key = Object.keys(value.constraints).pop() as string
-        return value.constraints[key]
-      })
+      if (Array.isArray(message.error_description) && message.error_description[0] instanceof ValidationError) {
+        const errors: string[] = message.error_description.map(value => {
 
-      this.message = {
-        ...message,
-        error_description: errors
-      } as IWarningMessage
+          const key = Object.keys(value.constraints).pop() as string
+          return value.constraints[key]
+        })
+
+        this.message = {
+          ...message,
+          error_description: errors
+        } as IWarningMessage
+
+      } else {
+        this.message = message as IWarningMessage
+      }
     }
   }
 }

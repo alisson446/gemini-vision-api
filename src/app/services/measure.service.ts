@@ -42,6 +42,18 @@ export class MeasureService {
       }, 400)
     }
 
+    const measureExists = await this.measureRepository.findByTypeAndDate({
+      type: measure_type,
+      measureDateTime: measure_datetime
+    })
+
+    if (measureExists) {
+      throw new Warning({
+        error_code: "DOUBLE_REPORT",
+        error_description: "Leitura do mês já realizada"
+      }, 409)
+    }
+
     const mimeType = extractMimeType(image) as string
     const base64 = image.split("base64,").pop() as string
 
