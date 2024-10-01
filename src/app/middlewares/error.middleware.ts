@@ -7,13 +7,13 @@ const warning = (error: Error, _request: Request, response: Response, _next: Nex
 
   const newLogger = {
     transactionId: crypto.randomUUID(),
-    service: "API Record",
+    service: "API Gemini-Vision",
     payload: null,
     cacheHit: false,
     operation: null,
     code: 500,
     message: ["Ocorreu um erro desconhecido. Tente novamente mais tarde."],
-    errorMessage: "Error 'unknown' in API Record",
+    errorMessage: "Error 'unknown' in API Gemini-Vision",
     stack: null
   }
 

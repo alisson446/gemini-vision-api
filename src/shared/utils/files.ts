@@ -23,6 +23,7 @@ export async function removeTempFile (filePath: string): Promise<void> {
 
 export function getExtensionFromBase64 (base64String: string): string {
   const mimeType = base64String.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/)
+
   if (mimeType && mimeType.length) {
     const mime = mimeType[1]
     switch (mime) {

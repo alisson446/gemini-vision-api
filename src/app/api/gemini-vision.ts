@@ -22,7 +22,7 @@ async function analyzeImage (fileUri: string, mimeType: string): Promise<string>
         fileUri
       }
     },
-    { text: "Extract the numeric value from the image." }
+    { text: "This image is about a house water and gas meter. Extract the main numeric value from the image and return only the number." }
   ])
 
   return result.response.text()
