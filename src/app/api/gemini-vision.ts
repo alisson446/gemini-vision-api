@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai"
-import { GoogleAIFileManager, UploadFileResponse } from "@google/generative-ai/server"
+import { FileMetadataResponse, GoogleAIFileManager, UploadFileResponse } from "@google/generative-ai/server"
 
 const fileManager = new GoogleAIFileManager(process.env.GEMINI_API_KEY as string)
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string)
@@ -14,7 +14,7 @@ export async function uploadImage (name: string, filePath: string, mimeType: str
   return uploadResponse
 }
 
-async function analyzeImage (fileUri: string, mimeType: string): Promise<string> {
+export async function analyzeImage (fileUri: string, mimeType: string): Promise<string> {
   const result = await model.generateContent([
     {
       fileData: {
@@ -28,4 +28,6 @@ async function analyzeImage (fileUri: string, mimeType: string): Promise<string>
   return result.response.text()
 }
 
-export { analyzeImage }
+export async function getImageData (fileName: string): Promise<FileMetadataResponse> {
+  return await fileManager.getFile(fileName)
+}

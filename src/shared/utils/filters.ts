@@ -1,7 +1,7 @@
 import { Request } from "express"
-import { IIndex } from "../../app/interfaces/Helper"
+import { IIndex } from "../../app/interfaces/Helpers"
 
-export const formatIndexFilters = ({ query }: Request, defaultOrderField: string = 'dataCadastro'): IIndex => {
+export const formatIndexFilters = ({ query }: Request, defaultOrderField = 'dataCadastro'): IIndex => {
 
   const { orderBy: ob, order: o, page: p, size: s, ...f } = query
 

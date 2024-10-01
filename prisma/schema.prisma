@@ -16,6 +16,8 @@ model Measure {
   customerCode    String
   measureDateTime DateTime
   type            MeasureType
+  confirmed       Boolean     @default(false)
+  imageUrl        String
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 }

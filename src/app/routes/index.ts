@@ -1,8 +1,8 @@
 import { Router } from "express"
-import { pacote } from "../routes/pacote.routes"
+import { measure } from "../routes/measure.routes"
 
 const router = Router()
 
-router.use('/upload', pacote)
+router.use('/upload', measure)
 
 export { router }

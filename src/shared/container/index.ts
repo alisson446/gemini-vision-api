@@ -2,12 +2,12 @@ import { container } from "tsyringe"
 import "reflect-metadata"
 
 //repositories
-import { PacoteRepository } from '../../app/repositories/pacote.repository'
+import { MeasureRepository } from '../../app/repositories/measure.repository'
 
 //interfaces
-import { IPacote } from "../../app/interfaces/Pacote"
+import { IMeasure } from "../../app/interfaces/Measure"
 
-container.registerSingleton<IPacote>(
-  "PacoteRepository",
-  PacoteRepository
+container.registerSingleton<IMeasure>(
+  "MeasureRepository",
+  MeasureRepository
 )

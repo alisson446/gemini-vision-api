@@ -39,14 +39,12 @@ const warning = (error: Error, _request: Request, response: Response, _next: Nex
 
   if (error.name === "PrismaClientInitializationError") {
     Object.assign(newLogger, {
-      message: ["Ops! Estamos com problemas técnicos. Tente novamente mais tarde ou contate nosso suporte."],
+      message: ["Ops! Estamos com problemas técnicos. Tente novamente mais tarde."],
       errorMessage: error.message
     })
   }
 
-  return response.status(newLogger.code).json({
-    message: newLogger.message
-  })
+  return response.status(newLogger.code).json(newLogger.message)
 }
 
 export { warning }

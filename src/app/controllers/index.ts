@@ -3,6 +3,6 @@ import "reflect-metadata"
 import "../../shared/container/index"
 
 //controllers
-import { PacoteController } from "./pacote.controller"
+import { MeasureController } from "./measure.controller"
 
-export const pacoteController = container.resolve(PacoteController)
+export const measureController = container.resolve(MeasureController)
