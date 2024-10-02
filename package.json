@@ -36,7 +36,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon ./src/server.ts'",
+    "dev": "nodemon ./src/server.ts",
     "db": "npx prisma migrate dev",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev:debug": "nodemon -L --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'node --inspect=0.0.0.0:9229 --require ts-node/register ./src/server.ts'"

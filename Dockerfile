@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:18-alpine
+FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
@@ -8,8 +8,8 @@ RUN npm ci
 
 COPY . .
 
-RUN npx prisma migrate dev
+RUN npx prisma generate
 
-EXPOSE 8000
+EXPOSE 3000
 
-CMD ["npm", "run", "dev:debug"]
+CMD ["npm", "run", "dev"]

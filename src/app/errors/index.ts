@@ -41,17 +41,15 @@ export class Warning {
     if (isIWarningMessage) {
 
       if (Array.isArray(message.error_description) && message.error_description[0] instanceof ValidationError) {
-        const errors: string[] = message.error_description.map(value => {
-
+        const errors: string = message.error_description.map(value => {
           const key = Object.keys(value.constraints).pop() as string
           return value.constraints[key]
-        })
+        }).join('; | ')
 
         this.message = {
           ...message,
           error_description: errors
         } as IWarningMessage
-
       } else {
         this.message = message as IWarningMessage
       }
