@@ -4,8 +4,9 @@ import { MeasureRepository } from "../repositories/measure.repository"
 import { extractMimeType } from "../../shared/utils/image"
 import { analyzeImage, getImageData, uploadImage } from "../api/gemini-vision"
 import { getExtensionFromBase64, removeTempFile, saveBase64AsTempFile } from "../../shared/utils/files"
-import { IMeasureConfirmValidator, IMeasureUploadValidator } from "../interfaces/Measure"
+import { IMeasureConfirmValidator, IMeasureListResponse, IMeasureUploadValidator } from "../interfaces/Measure"
 import { validate } from "class-validator"
+import { IIndex } from "../interfaces/Helpers"
 
 @injectable()
 export class MeasureService {
@@ -14,6 +15,26 @@ export class MeasureService {
     @inject("MeasureRepository")
     private measureRepository: MeasureRepository
   ) { }
+
+  list = async (customer_code: string, data: IIndex): Promise<{
+    customer_code: string
+    measures: IMeasureListResponse[]
+  }> => {
+
+    const measures = await this.measureRepository.list(customer_code, data)
+
+    if (!measures.length) {
+      throw new Warning({
+        error_code: "MEASURES_NOT_FOUND",
+        error_description: "Nenhuma leitura encontrada"
+      }, 404)
+    }
+
+    return {
+      customer_code,
+      measures
+    }
+  }
 
   upload = async ({
     image,
@@ -43,8 +64,9 @@ export class MeasureService {
     }
 
     const measureExists = await this.measureRepository.findByTypeAndDate({
-      type: measure_type,
-      measureDateTime: measure_datetime
+      customer_code,
+      measure_type,
+      measure_datetime
     })
 
     if (measureExists) {
@@ -71,17 +93,17 @@ export class MeasureService {
       const analyzedImage = await analyzeImage(uploadResponse.file.uri, uploadResponse.file.mimeType)
 
       const measure = await this.measureRepository.create({
-        value: parseInt(analyzedImage),
-        customerCode: customer_code,
-        measureDateTime: measure_datetime,
-        type: measure_type,
-        imageUrl: imageData.uri
+        llm_value: parseInt(analyzedImage),
+        customer_code,
+        measure_datetime,
+        measure_type,
+        image_url: imageData.uri
       })
 
       return {
         image_url: imageData.uri,
         measure_value: analyzedImage,
-        measure_uuid: measure.id
+        measure_uuid: measure.measure_uuid
       }
 
     } catch (error: any) {
@@ -121,7 +143,7 @@ export class MeasureService {
       }, 404)
     }
 
-    if (measure.confirmed) {
+    if (measure.has_confirmed) {
       throw new Warning({
         error_code: "CONFIRMATION_DUPLICATE",
         error_description: "Leitura do mês já realizada"
@@ -129,8 +151,8 @@ export class MeasureService {
     }
 
     await this.measureRepository.confirm({
-      id: measure_uuid,
-      value: parseInt(confirmed_value)
+      measure_uuid,
+      confirmed_value: parseInt(confirmed_value)
     })
 
     return {

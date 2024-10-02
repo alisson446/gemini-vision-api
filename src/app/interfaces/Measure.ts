@@ -2,37 +2,48 @@ import { MeasureType } from "@prisma/client"
 import { IsEnum, IsNotEmpty, IsNumber, IsString, Validate } from "class-validator"
 import { fieldInvalid, fieldRequired } from "../../shared/utils/messages"
 import { DateValidatorConstraint, ImageValidatorConstraint } from "../../shared/utils/customClassValidator"
+import { IIndex } from "./Helpers"
 
 export interface IMeasure {
+  list (customer_code: string, data: IIndex): Promise<IMeasureListResponse[]>
   create (data: IMeasureDTO): Promise<IMeasureResponse>
-  findById (id: string): Promise<IMeasureResponse | null>
+  findById (measure_uuid: string): Promise<IMeasureResponse | null>
   findByTypeAndDate (data: IMeasureFindTypeAndDate): Promise<IMeasureResponse | null>
   confirm (data: IMeasureConfirm): Promise<IMeasureResponse>
 }
 
+export interface IMeasureListResponse {
+  measure_uuid: string
+  measure_datetime: Date
+  measure_type: MeasureType
+  has_confirmed?: boolean
+  image_url: string
+}
+
 export interface IMeasureDTO {
-  value: number
-  customerCode: string
-  measureDateTime: Date
-  type: MeasureType
-  confirmed?: boolean
-  imageUrl: string
+  llm_value: number
+  customer_code: string
+  measure_datetime: Date
+  measure_type: MeasureType
+  has_confirmed?: boolean
+  image_url: string
 }
 
 export interface IMeasureResponse extends IMeasureDTO {
-  id: string
+  measure_uuid: string
   createdAt: Date
   updatedAt: Date
 }
 
 export interface IMeasureFindTypeAndDate {
-  type: MeasureType
-  measureDateTime: Date
+  customer_code: string
+  measure_type: MeasureType
+  measure_datetime: Date
 }
 
 export interface IMeasureConfirm {
-  id: string
-  value: number
+  measure_uuid: string
+  confirmed_value: number
 }
 
 export class IMeasureUploadValidator {
